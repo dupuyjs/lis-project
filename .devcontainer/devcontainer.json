@@ -1,0 +1,10 @@
+{
+    "name": "LIS project dev environment",
+    "build": {
+        "dockerfile": "Dockerfile",
+    },
+    "extensions": ["hashicorp.terraform"],
+    "settings": {
+        "editor.formatOnSave": true
+    }
+}
