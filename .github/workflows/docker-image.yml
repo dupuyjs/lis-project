@@ -28,4 +28,14 @@ jobs:
         docker build ./nlp -t ${{ secrets.ACR_LOGIN_SERVER }}/lis-nlp:${{ github.run_number }}
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/lis-nlp:${{ github.run_number }}
         
+    - name: 'Deploy to Azure Container Instances'
+      uses: 'azure/aci-deploy@v1'
+      with:
+        resource-group: lis0d40w-dev-rg
+        dns-name-label: lis-nlp
+        image: ${{ secrets.ACR_LOGIN_SERVER }}/lis-nlp:${{ github.run_number }}
+        registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        name: lis-nlp
+        location: 'westeurope'      
     
