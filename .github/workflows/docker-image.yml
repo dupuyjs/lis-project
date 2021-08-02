@@ -32,10 +32,15 @@ jobs:
       uses: 'azure/aci-deploy@v1'
       with:
         resource-group: lis0d40w-dev-rg
+        name: lis0d40waci
         dns-name-label: lis-nlp
         image: ${{ secrets.ACR_LOGIN_SERVER }}/lis-nlp:${{ github.run_number }}
         registry-username: ${{ secrets.REGISTRY_USERNAME }}
         registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-        name: lis-nlp
-        location: 'westeurope'      
+        location: 'westeurope'
+        ports: 8000
+        gpu-count: 1
+        gpu-sku: K80
+        
+        
     
