@@ -10,11 +10,12 @@ jobs:
     steps:
     - name: Checkout the repo
       uses: actions/checkout@v2
-    
-    - name: Build the Docker image
-      run: |
-        docker build ./nlp -t ${{ secrets.ACR_LOGIN_SERVER }}/lis-nlp:${{ github.run_number }}
       
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
     - name: Login to the Container Registry  
       uses: azure/docker-login@v1
       with:
@@ -22,6 +23,9 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
         
-    - name: Push image
+    - name: Build and Push the Docker image
       run: |
+        docker build ./nlp -t ${{ secrets.ACR_LOGIN_SERVER }}/lis-nlp:${{ github.run_number }}
         docker push ${{ secrets.ACR_LOGIN_SERVER }}/lis-nlp:${{ github.run_number }}
+        
+    
