@@ -11,4 +11,4 @@ def hello():
 def test():
     classifier = pipeline("sentiment-analysis")
     result = classifier("I've been waiting for a HuggingFace course my whole life.")
-    return result
+    return tupple(result)
