@@ -13,11 +13,11 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
-variable "service_principal_objectid" {
-  description = "Service principal object id."
-  type        = string
-  sensitive   = true
-}
+# variable "service_principal_objectid" {
+#   description = "Service principal object id."
+#   type        = string
+#   sensitive   = true
+# }
 variable "container_registry_sku" {
   description = "Azure container registry sku."
   type        = string
