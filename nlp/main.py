@@ -16,5 +16,5 @@ def test():
         sentence = args.get("sentence")
         result = classifier(sentence)
         return result[0], 200
-    else
+    else:
         return "No query string received", 200
