@@ -39,7 +39,7 @@ resource "azurerm_container_registry" "acr" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   sku                 = var.container_registry_sku
-  admin_enabled       = false
+  admin_enabled       = true
   tags                = local.required_tags
 }
 
@@ -52,9 +52,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
   tags                = local.required_tags
 
   default_node_pool {
-    name            = "default"
-    node_count      = 1
-    vm_size         = "Standard_NC6"
+    name       = "default"
+    node_count = 1
+    vm_size    = "Standard_NC6"
   }
 
   identity {
@@ -62,9 +62,48 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 }
 
-# Assign kubelet_identity with acrpull role to registry scope
-resource "azurerm_role_assignment" "aks_role" {
+# Assign kubelet_identity with acrpull role to pull images from registry (used by kubernetes)
+resource "azurerm_role_assignment" "acr_pull_role" {
   scope                = azurerm_container_registry.acr.id
   role_definition_name = "acrpull"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+}
+
+# Create azure key vault
+resource "azurerm_key_vault" "kv" {
+  name                = "${local.name_prefix}kv"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  sku_name            = var.key_vault_sku
+  tags                = local.required_tags
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
+
+    secret_permissions = [
+      "get",
+      "set"
+    ]
+  }
+}
+
+# Create secrets
+resource "azurerm_key_vault_secret" "secret_acr_login" {
+  name         = "ACR-LOGIN"
+  value        = azurerm_container_registry.acr.login_server
+  key_vault_id = azurerm_key_vault.kv.id
+}
+
+resource "azurerm_key_vault_secret" "secret_acr_username" {
+  name         = "ACR-USERNAME"
+  value        = azurerm_container_registry.acr.admin_username
+  key_vault_id = azurerm_key_vault.kv.id
+}
+
+resource "azurerm_key_vault_secret" "secret_acr_password" {
+  name         = "ACR-PASSWORD"
+  value        = azurerm_container_registry.acr.admin_password
+  key_vault_id = azurerm_key_vault.kv.id
 }

@@ -23,3 +23,8 @@ variable "container_registry_sku" {
   type        = string
   default     = "Basic"
 }
+variable "key_vault_sku" {
+  description = "Azure key vault sku."
+  type        = string
+  default     = "standard"
+}
