@@ -19,16 +19,16 @@ jobs:
     - name: Get key vault secrets
       uses: Azure/get-keyvault-secrets@v1
       with: 
-        keyvault: secrets.KEYVAULT_NAME
+        keyvault: ${{ secrets.KEYVAULT_NAME }}
         secrets: 'ACR-LOGIN, ACR-USERNAME, ACR-PASSWORD'
       id: acrsecrets
 
     - name: Login to the container registry
       uses: azure/docker-login@v1
       with:
-        login-server: ${{ acrsecrets.ACR-LOGIN }}
-        username: ${{ acrsecrets.outputs.ACR-USERNAME }}
-        password: ${{ acrsecrets.outputs.ACR-PASSWORD }}
+        login-server: ${{ steps.acrsecrets.ACR-LOGIN }}
+        username: ${{ steps.acrsecrets.outputs.ACR-USERNAME }}
+        password: ${{ steps.acrsecrets.outputs.ACR-PASSWORD }}
         
     # - name: Build and Push the Docker image
     #   run: |
