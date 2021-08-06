@@ -11,17 +11,24 @@ jobs:
     - name: Checkout the repo
       uses: actions/checkout@v2
       
-    - name: Login via Azure CLI
+    - name: Login with azure credentials
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    # - name: Login to the Container Registry  
-    #   uses: azure/docker-login@v1
-    #   with:
-    #     login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-    #     username: ${{ secrets.REGISTRY_USERNAME }}
-    #     password: ${{ secrets.REGISTRY_PASSWORD }}
+    - name: Get key vault secrets
+      uses: Azure/get-keyvault-secrets@v1
+      with: 
+        keyvault: secrets.KEYVAULT_NAME
+        secrets: 'ACR-LOGIN, ACR-USERNAME, ACR-PASSWORD'
+      id: acrsecrets
+
+    - name: Login to the container registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ acrsecrets.ACR-LOGIN }}
+        username: ${{ acrsecrets.outputs.ACR-USERNAME }}
+        password: ${{ acrsecrets.outputs.ACR-PASSWORD }}
         
     # - name: Build and Push the Docker image
     #   run: |
