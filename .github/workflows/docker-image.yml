@@ -26,14 +26,14 @@ jobs:
     - name: Login to the container registry
       uses: azure/docker-login@v1
       with:
-        login-server: ${{ steps.acrsecrets.ACR-LOGIN }}
+        login-server: ${{ steps.acrsecrets.outputs.ACR-LOGIN }}
         username: ${{ steps.acrsecrets.outputs.ACR-USERNAME }}
         password: ${{ steps.acrsecrets.outputs.ACR-PASSWORD }}
         
-    # - name: Build and Push the Docker image
-    #   run: |
-    #     docker build ./nlp -t ${{ secrets.ACR_LOGIN_SERVER }}/lis-nlp:${{ github.run_number }}
-    #     docker push ${{ secrets.ACR_LOGIN_SERVER }}/lis-nlp:${{ github.run_number }}
+    - name: Build and push the docker image
+      run: |
+        docker build ./nlp -t ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
+        docker push ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
         
     # - name: 'Deploy to Azure Container Instances'
     #   uses: 'azure/aci-deploy@v1'
