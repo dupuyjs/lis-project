@@ -53,8 +53,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   default_node_pool {
     name       = "default"
-    node_count = 1
-    vm_size    = "Standard_NC6"
+    node_count = var.aks_pool_node_count
+    vm_size    = var.aks_pool_vm_size
   }
 
   identity {
@@ -84,7 +84,8 @@ resource "azurerm_key_vault" "kv" {
 
     secret_permissions = [
       "get",
-      "set"
+      "set",
+      "list"
     ]
   }
 }
