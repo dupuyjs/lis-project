@@ -13,11 +13,12 @@ WORKDIR /app
 
 ADD requirements.txt /app
 ADD main.py /app
+ADD config.py /app
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
-# EXPOSE 8000
-# CMD ["gunicorn", "-w 2", "-b", "0.0.0.0:8000", "main:app"]
+EXPOSE 8000
+CMD ["gunicorn", "-c", "/app/config.py", "main:app"]
 
-CMD [ "sleep", "infinity" ]
+#CMD [ "sleep", "infinity" ]

@@ -2,7 +2,6 @@ from flask import Flask, request
 from transformers import pipeline
 
 app = Flask(__name__)
-classifier = pipeline("sentiment-analysis")
 
 @app.route("/")
 def hello():
@@ -14,6 +13,7 @@ def test():
 
     if "sentence" in args:
         sentence = args.get("sentence")
+        classifier = pipeline("sentiment-analysis")
         result = classifier(sentence)
         return result[0], 200
     else:
