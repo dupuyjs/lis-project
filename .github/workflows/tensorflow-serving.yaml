@@ -16,3 +16,8 @@ jobs:
         mkdir /tmp/resnet
         curl -s http://download.tensorflow.org/models/official/20181001_resnet/savedmodels/resnet_v2_fp32_savedmodel_NHWC_jpg.tar.gz | \
         tar --strip-components=2 -C /tmp/resnet -xvz
+    - name: Commit image for deployment
+      run: |
+        docker run -d --name serving_base tensorflow/serving
+        docker kill serving_base
+        docker rm serving_base
