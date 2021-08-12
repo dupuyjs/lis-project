@@ -1,20 +1,14 @@
-from flask import Flask, request
+from fastapi import FastAPI
 from transformers import pipeline
 
-app = Flask(__name__)
+app = FastAPI()
+classifier = pipeline("sentiment-analysis")
 
-@app.route("/")
-def hello():
-    return "Hello, World!"
+@app.get('/api/healthcheck', status_code=200)
+async def healthcheck():
+    return 'Ready'
 
-@app.route("/sentiment")
-def test():
-    args = request.args
-
-    if "sentence" in args:
-        sentence = args.get("sentence")
-        classifier = pipeline("sentiment-analysis")
-        result = classifier(sentence)
-        return result[0], 200
-    else:
-        return "No query string received", 200
+@app.get('/api/sentiment')
+async def predict(sentence: str):
+    result = classifier(sentence)
+    return result[0]

@@ -19,6 +19,4 @@ RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
 EXPOSE 8000
-CMD ["gunicorn", "-c", "/app/config.py", "main:app"]
-
-#CMD [ "sleep", "infinity" ]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
