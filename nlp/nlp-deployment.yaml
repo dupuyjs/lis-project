@@ -19,17 +19,3 @@ spec:
         image: lisxxxxxacr.azurecr.io/lis-nlp:xx
         ports:
         - containerPort: 8000
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    run: nlp-service
-  name: nlp-service
-spec:
-  ports:
-  - port: 8000
-    targetPort: 8000
-  selector:
-    app: nlp-server
-  type: LoadBalancer

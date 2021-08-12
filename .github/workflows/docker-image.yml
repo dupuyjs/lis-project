@@ -32,13 +32,13 @@ jobs:
         
     - name: Build and push the docker image
       run: |
-        docker build ./nlp -t ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
+        docker build ./nlp/image -t ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
         docker push ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
 
     - name: Update deployment.yaml
       uses: microsoft/variable-substitution@v1
       with:
-        files: '${{github.workspace}}/nlp/deployment.yaml'
+        files: '${{github.workspace}}/nlp/nlp-deployment.yaml'
       env:
         spec.template.spec.containers[0].image: ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
 
