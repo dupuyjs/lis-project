@@ -13,7 +13,6 @@ WORKDIR /app
 
 ADD requirements.txt /app
 ADD main.py /app
-ADD config.py /app
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
