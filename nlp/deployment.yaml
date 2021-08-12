@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nlp-deployment
+  labels:
+    app: nlp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nlp-server
+  template:
+    metadata:
+      labels:
+        app: nlp-server
+    spec:
+      containers:
+      - name: nlp-container
+        image: lisxxxxxacr.azurecr.io/lis-nlp:xx
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: nlp-service
+  name: nlp-service
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: nlp-server
+  type: LoadBalancer

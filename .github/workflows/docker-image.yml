@@ -34,6 +34,19 @@ jobs:
       run: |
         docker build ./nlp -t ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
         docker push ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
+
+    - name: Update deployment.yaml
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: '${{github.workspace}}/nlp/deployment.yaml'
+      env:
+        spec.template.spec.containers[0].image: ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
+
+    - name: 'Deploy to Azure Container Instances'
+      run: |
+        az aks install-cli
+        az aks get-credentials --resource-group ${{ steps.acrsecrets.outputs.RG-NAME }} --name ${{ steps.acrsecrets.outputs.AKS-NAME }}
+
         
     # - name: 'Deploy to Azure Container Instances'
     #   uses: 'azure/aci-deploy@v1'
