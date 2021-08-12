@@ -40,7 +40,7 @@ jobs:
       with:
         files: '${{github.workspace}}/nlp/nlp-deployment.yaml'
       env:
-        apiVersion: 'test'
+        spec.template.spec.containers.0.image: ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
 
     # - name: 'Deploy to Azure Container Instances'
     #   run: |
