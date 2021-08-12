@@ -1,5 +1,8 @@
 FROM nvidia/cuda:11.4.1-cudnn8-runtime-ubuntu18.04
 
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8 
+
 RUN apt-get update && \
     apt install -y bash \
                    build-essential \
