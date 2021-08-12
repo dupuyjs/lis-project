@@ -13,13 +13,23 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
-variable "service_principal_objectid" {
-  description = "Service principal object id."
-  type        = string
-  sensitive   = true
-}
 variable "container_registry_sku" {
   description = "Azure container registry sku."
   type        = string
   default     = "Basic"
+}
+variable "key_vault_sku" {
+  description = "Azure key vault sku."
+  type        = string
+  default     = "standard"
+}
+variable "aks_pool_node_count" {
+  description = "The initial number of nodes which should exist in the default node pool."
+  type        = number
+  default     = 1
+}
+variable "aks_pool_vm_size" {
+  description = "The size of the Virtual Machine."
+  type        = string
+  default     = "Standard_NC6"
 }

@@ -30,8 +30,14 @@ RUN GO111MODULE="on" go get github.com/terraform-docs/terraform-docs@v0.14.1
 RUN chmod +x /root/go/bin/terraform-docs
 ENV PATH "$PATH:/root/go/bin"
 
+# Install Helm
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+RUN chmod 700 get_helm.sh
+RUN ./get_helm.sh
+
 # Cleanup
 RUN rm terraform_${TERRAFORM_VERSION}_${TERRAFORM_OS_ARCH}.zip
 RUN rm -rf /ci
+RUN rm get_helm.sh
 
 CMD [ "sleep", "infinity" ]
