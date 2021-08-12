@@ -54,8 +54,8 @@ jobs:
     - name: 'Deploy application and service to kubernetes cluster'
       run: |
         az aks get-credentials --resource-group ${{ steps.acrsecrets.outputs.RG-NAME }} --name ${{ steps.acrsecrets.outputs.AKS-NAME }}
-        kubeclt apply -f ./nlp/nlp-deployment.yaml
-        kubeclt apply -f ./nlp/nlp-service.yaml
+        kubectl apply -f ./nlp/nlp-deployment.yaml
+        kubectl apply -f ./nlp/nlp-service.yaml
 
         
         
