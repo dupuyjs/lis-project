@@ -42,6 +42,9 @@ jobs:
       env:
         spec.template.spec.containers.0.image: ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
 
+    - name: Display content
+      run: |
+        cat ${{github.workspace}}/nlp/nlp-deployment.yaml
     # - name: 'Deploy to Azure Container Instances'
     #   run: |
     #     az aks install-cli
