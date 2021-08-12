@@ -91,6 +91,12 @@ resource "azurerm_key_vault" "kv" {
 }
 
 # Create secrets
+resource "azurerm_key_vault_secret" "secret_rg_name" {
+  name         = "RG-NAME"
+  value        = azurerm_resource_group.rg.name
+  key_vault_id = azurerm_key_vault.kv.id
+}
+
 resource "azurerm_key_vault_secret" "secret_acr_login" {
   name         = "ACR-LOGIN"
   value        = azurerm_container_registry.acr.login_server
@@ -106,5 +112,11 @@ resource "azurerm_key_vault_secret" "secret_acr_username" {
 resource "azurerm_key_vault_secret" "secret_acr_password" {
   name         = "ACR-PASSWORD"
   value        = azurerm_container_registry.acr.admin_password
+  key_vault_id = azurerm_key_vault.kv.id
+}
+
+resource "azurerm_key_vault_secret" "secret_aks_name" {
+  name         = "AKS-NAME"
+  value        = azurerm_kubernetes_cluster.aks.name
   key_vault_id = azurerm_key_vault.kv.id
 }
