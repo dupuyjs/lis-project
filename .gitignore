@@ -1,3 +1,14 @@
+### Developer ###
+.vscode/
+.idea/
+local.env
+.env
+.DS_Store
+.deployment
+
+# a developer can copy his/her own files in a me/ folder without having them in git
+**/me/
+
 # Local .terraform directories
 **/.terraform/*
 
@@ -35,3 +46,37 @@ terraform.rc
 
 # Ignore Python cache
 **/__pycache__/*
+*.whl
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyTest
+.pytest_cache/
+.coverage
+coverage.xml
+pytest-results.xml
+pytest-integration-results.xml
+pytest-e2e-results.xml
+
+# flask session folder
+flask_session/
+tests-report.md

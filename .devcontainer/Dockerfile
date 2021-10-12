@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.10
 
 ARG BUILD_TERRAFORM_VERSION="1.0.3"
 ARG BUILD_TERRAFORM_OS_ARCH=linux_amd64
@@ -9,7 +9,7 @@ ENV TERRAFORM_OS_ARCH=${BUILD_TERRAFORM_OS_ARCH}
 # Update & Install tool
 RUN apt-get update && \ 
     apt-get upgrade -y && \
-    apt-get install -y unzip curl git wget
+    apt-get install -y sudo git curl wget make procps python3-pip unzip pandoc jq
 
 # Install Terraform
 RUN curl -Os https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_${TERRAFORM_OS_ARCH}.zip && \
@@ -35,6 +35,10 @@ RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master
 RUN chmod 700 get_helm.sh
 RUN ./get_helm.sh
 
+# Python things: update pip, install az-cli
+RUN python3 -m pip install pip --upgrade
+
+RUN python3 -m pip install black pytest
 # Cleanup
 RUN rm terraform_${TERRAFORM_VERSION}_${TERRAFORM_OS_ARCH}.zip
 RUN rm -rf /ci

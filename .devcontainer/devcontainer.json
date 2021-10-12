@@ -3,8 +3,25 @@
     "build": {
         "dockerfile": "Dockerfile",
     },
-    "extensions": ["hashicorp.terraform"],
+    "extensions": [
+        "hashicorp.terraform",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-vscode.azurecli",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-pull-request-github",
+        "editorconfig.editorconfig",
+    ],
     "settings": {
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "shellcheck.customArgs": [
+            "-x"
+        ],
+        "python.pythonPath": "/usr/bin/python3",
+        "python.envFile": "${workspaceFolder}/python-path.env",
+        "python.formatting.provider": "black",
+        "python.testing.nosetestsEnabled": false,
+        "python.testing.pytestEnabled": true
     }
 }
