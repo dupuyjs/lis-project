@@ -55,7 +55,7 @@ class AadBearerMiddleware(AuthenticationBackend):
             return AuthCredentials(user.scopes), user
 
         except Exception as ex:
-            raise AuthenticationError("Invalid auth credentials", ex)
+            raise AuthenticationError("Invalid auth credentials", AuthError(exception=ex))
 
     @staticmethod
     def get_token_from_header(request: Request):

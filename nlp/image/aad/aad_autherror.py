@@ -25,7 +25,11 @@ class AuthError(Exception):
             elif hasattr(exception, "args") and len(exception.args) >= 1:
                 description = exception.args[0]
 
-        self.description = description
+        if description is not None and description != "":
+            self.description = description
+        else:
+            self.description = code
+            
         super().__init__(description)
 
         self.status_code = status_code

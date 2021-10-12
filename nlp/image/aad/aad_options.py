@@ -17,9 +17,6 @@ class AzureAdSettings(BaseSettings):
     api_scopes      : API scopes list (separated by a blank space).
         ex:"user_impersonation"
     graph_scopes    : GRAPH scopes list (separated by a blank space). ex:"User.Read"
-    vault_url : vault url, containing the certificate to use.
-        ex:"https://rgbertkvd10.vault.azure.net/"
-    vault_certificate_name : certificate name, contained in vault. ex:"mycert"
 
     if not present, each value will be retrieved from environment variables:
     "CLIENT_ID", "AUTHORITY", "DOMAIN", "TENANT_ID", "API_SCOPES",
@@ -28,15 +25,12 @@ class AzureAdSettings(BaseSettings):
     """
 
     client_id: str = Field(None, description="Client id", env="CLIENT_ID")
+    client_secret: str = Field(None, description="Client secret", env="CLIENT_SECRET")
     authority: str = Field(None, description="login authority", env="AUTHORITY")
     domain: str = Field(None, description="Domain name", env="DOMAIN")
     tenant_id: str = Field(None, description="Tenant Id", env="TENANT_ID")
     api_scopes_str: str = Field(None, description="API Scopes", env="API_SCOPES")
     graph_scopes_str: str = Field(None, description="API Scopes", env="GRAPH_SCOPES")
-    vault_url: str = Field(None, description="Global Vault Url", env="VAULT_URL")
-    vault_certificate_name: str = Field(
-        None, description="Certificate name", env="VAULT_CERTIFICATE_NAME"
-    )
     aad_issuers_list: List[str] = []
 
     @property

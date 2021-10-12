@@ -156,6 +156,7 @@ class AadAuthenticationClient:
         scopeType: ScopeType = ScopeType.WebApi,
         user: AadUser = None,
         scopes: Union[List[str], str] = None,
+        validate:bool = False,
         **kwargs,
     ) -> Optional[AadUser]:
 
@@ -164,9 +165,6 @@ class AadAuthenticationClient:
 
             authentication_token: AuthToken = None
             exception: Exception = None
-
-            # We can't validate a graph token
-            validate = scopeType == ScopeType.WebApi
 
             # ---------------------------------------------------
             # Case 0: Login fallback, only for login UI
@@ -447,7 +445,7 @@ class AadAuthenticationClient:
                 return auth_token_from_cache
 
             token = cca.acquire_token_on_behalf_of(
-                user_assertion=auth_token.access_token, scopes=scopes, **kwargs
+                user_assertion=auth_token.access_token, scopes=scopes
             )
 
             if not token or "access_token" not in token:
@@ -487,7 +485,7 @@ class AadAuthenticationClient:
         try:
             self._ensure_options()
 
-            client_credential = kwargs.get("client_credential")
+            client_credential = kwargs.get("client_credential") or self.options.client_secret
 
             # if not client_credential:
 
