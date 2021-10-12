@@ -23,13 +23,51 @@ variable "key_vault_sku" {
   type        = string
   default     = "standard"
 }
-variable "aks_pool_node_count" {
-  description = "The initial number of nodes which should exist in the default node pool."
+
+variable "asa_account_tier" {
+  description = "The Tier level of the Storage Account."
+  type        = string
+  default     = "Standard"
+}
+
+variable "asa_replication_type" {
+  description = "The Storage Account Replication Type."
+  type        = string
+  default     = "LRS"
+}
+
+variable "ai_app_type" {
+  description = "Specifies the type of Application Insights to create."
+  type        = string
+  default     = "web"
+}
+
+variable "ccluster_vm_priority" {
+  description = "The priority of the VM."
+  type        = string
+  default     = "Dedicated"
+}
+
+variable "ccluster_vm_size" {
+  description = "The size of the ML Compute Cluster VM."
+  type        = string
+  default     = "Standard_NC6"
+}
+
+variable "ccluster_scale_min_node_count" {
+  description = "Minimal node count."
+  type        = number
+  default     = 0
+}
+
+variable "ccluster_scale_max_node_count" {
+  description = "Maximal node count."
   type        = number
   default     = 1
 }
-variable "aks_pool_vm_size" {
-  description = "The size of the Virtual Machine."
+
+variable "cognitive_account_sku" {
+  description = "Specifies the SKU Name for this Cognitive Service Account."
   type        = string
-  default     = "Standard_NC6"
+  default     = "S0"
 }

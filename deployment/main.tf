@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "=2.69.0"
+      version = "=2.80.0"
     }
   }
 }
@@ -43,30 +43,11 @@ resource "azurerm_container_registry" "acr" {
   tags                = local.required_tags
 }
 
-# Create azure kubernetes cluster
-resource "azurerm_kubernetes_cluster" "aks" {
-  name                = "${local.name_prefix}aks"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix          = "${local.name_prefix}k8s"
-  tags                = local.required_tags
-
-  default_node_pool {
-    name       = "default"
-    node_count = var.aks_pool_node_count
-    vm_size    = var.aks_pool_vm_size
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-}
-
-# Assign kubelet_identity with acrpull role to pull images from registry (used by kubernetes)
+# Assign app container identity with acrpull role to pull images from registry (used by kubernetes)
 resource "azurerm_role_assignment" "acr_pull_role" {
   scope                = azurerm_container_registry.acr.id
   role_definition_name = "acrpull"
-  principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+  principal_id         = azurerm_app_service.app_container.identity.principal_id
 }
 
 # Create azure key vault
@@ -85,7 +66,8 @@ resource "azurerm_key_vault" "kv" {
     secret_permissions = [
       "get",
       "set",
-      "list"
+      "list",
+      "delete"
     ]
   }
 }
@@ -115,8 +97,93 @@ resource "azurerm_key_vault_secret" "secret_acr_password" {
   key_vault_id = azurerm_key_vault.kv.id
 }
 
-resource "azurerm_key_vault_secret" "secret_aks_name" {
-  name         = "AKS-NAME"
-  value        = azurerm_kubernetes_cluster.aks.name
-  key_vault_id = azurerm_key_vault.kv.id
+# Create a Storage Account
+resource "azurerm_storage_account" "sa" {
+  name                     = "${local.name_prefix}sa"
+  location                 = azurerm_resource_group.rg.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  account_tier             = var.asa_account_tier
+  account_replication_type = var.asa_replication_type
+}
+
+# Create an Application Insights
+resource "azurerm_application_insights" "insights" {
+  name                = "${local.name_prefix}ai"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  application_type    = var.ai_app_type
+}
+
+# Create an Azure ML Workspace
+resource "azurerm_machine_learning_workspace" "workspace" {
+  name                    = "${local.name_prefix}mlw"
+  location                = azurerm_resource_group.rg.location
+  resource_group_name     = azurerm_resource_group.rg.name
+  application_insights_id = azurerm_application_insights.insights.id
+  key_vault_id            = azurerm_key_vault.kv.id
+  storage_account_id      = azurerm_storage_account.sa.id
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
+# Create an Azure ML Compute Cluster
+resource "azurerm_machine_learning_compute_instance" "compute_instance" {
+  name                          = "${local.name_prefix}cc"
+  location                      = azurerm_resource_group.rg.location
+  virtual_machine_size          = var.ccluster_vm_size
+  machine_learning_workspace_id = azurerm_machine_learning_workspace.workspace.id
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
+# Create an Azure Cognitive Services Account (SpeechServices)
+resource "azurerm_cognitive_account" "cognitive_account" {
+  name                = "${local.name_prefix}cognitive"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  kind                = "SpeechServices"
+
+  sku_name = var.cognitive_account_sku
+}
+
+resource "azurerm_app_service_plan" "app_plan" {
+  name                = "${local.name_prefix}app_plan"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  kind                = "Linux"
+  reserved            = true
+
+  sku {
+    tier = "Standard"
+    size = "S2"
+  }
+}
+
+resource "azurerm_app_service" "app_container" {
+  name                    = "${local.name_prefix}app"
+  location                = azurerm_resource_group.rg.location
+  resource_group_name     = azurerm_resource_group.rg.name
+  app_service_plan_id     = azurerm_app_service_plan.app_plan.id
+  https_only              = true
+  client_affinity_enabled = true
+
+  site_config {
+    always_on                            = true
+    acr_use_managed_identity_credentials = true
+    acr_user_managed_identity_client_id  = azurerm_role_assignment.acr_pull_role.id
+
+    linux_fx_version = "DOCKER|registry.hub.docker.com/tutum/hello-world"
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  app_settings = {
+    "AZURE_MONITOR_INSTRUMENTATION_KEY" = azurerm_application_insights.insights.instrumentation_key
+  }
 }
