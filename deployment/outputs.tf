@@ -26,7 +26,7 @@ output "key_vault_name" {
 
 output "storage_account_name" {
   description = "The Storage Account name."
-  value       = azurerm_storage_account.sa.name
+  value       = azurerm_storage_account.st.name
 }
 
 output "ml_workspace_name" {
@@ -41,12 +41,12 @@ output "ml_compute_instance_name" {
 
 output "speechservices_cognitiveaccount_name" {
   description = "The Cognitive Service Account name."
-  value       = azurerm_cognitive_account.cognitive_account.name
+  value       = azurerm_cognitive_account.speech.name
 }
 
 output "speechservices_cognitiveaccount_key" {
   description = "The Cognitive Service Account Key."
-  value       = azurerm_cognitive_account.cognitive_account.primary_access_key
+  value       = azurerm_cognitive_account.speech.primary_access_key
   sensitive   = true
 }
 
