@@ -98,12 +98,13 @@ resource "azurerm_key_vault_secret" "secret_acr_password" {
 }
 
 # Create a Storage Account
-resource "azurerm_storage_account" "sa" {
-  name                     = "${local.name_prefix}sa"
+resource "azurerm_storage_account" "st" {
+  name                     = "${local.name_prefix}st"
   location                 = azurerm_resource_group.rg.location
   resource_group_name      = azurerm_resource_group.rg.name
-  account_tier             = var.asa_account_tier
-  account_replication_type = var.asa_replication_type
+  account_tier             = var.storage_account_tier
+  account_replication_type = var.storage_replication_type
+  tags                     = local.required_tags
 }
 
 # Create an Application Insights
@@ -111,7 +112,8 @@ resource "azurerm_application_insights" "insights" {
   name                = "${local.name_prefix}ai"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  application_type    = var.ai_app_type
+  application_type    = var.insights_app_type
+  tags                = local.required_tags
 }
 
 # Create an Azure ML Workspace
@@ -121,37 +123,43 @@ resource "azurerm_machine_learning_workspace" "workspace" {
   resource_group_name     = azurerm_resource_group.rg.name
   application_insights_id = azurerm_application_insights.insights.id
   key_vault_id            = azurerm_key_vault.kv.id
-  storage_account_id      = azurerm_storage_account.sa.id
+  storage_account_id      = azurerm_storage_account.st.id
 
   identity {
     type = "SystemAssigned"
   }
+
+  tags = local.required_tags
 }
 
-# Create an Azure ML Compute Cluster
+# Create an Azure ML Compute Instance
 resource "azurerm_machine_learning_compute_instance" "compute_instance" {
-  name                          = "${local.name_prefix}cc"
+  name                          = "${local.name_prefix}ci"
   location                      = azurerm_resource_group.rg.location
-  virtual_machine_size          = var.ccluster_vm_size
+  virtual_machine_size          = var.ml_instance_vm_size
   machine_learning_workspace_id = azurerm_machine_learning_workspace.workspace.id
 
   identity {
     type = "SystemAssigned"
   }
+
+  tags = local.required_tags
 }
 
 # Create an Azure Cognitive Services Account (SpeechServices)
-resource "azurerm_cognitive_account" "cognitive_account" {
-  name                = "${local.name_prefix}cognitive"
+resource "azurerm_cognitive_account" "speech" {
+  name                = "${local.name_prefix}speech"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "SpeechServices"
 
-  sku_name = var.cognitive_account_sku
+  sku_name = var.cognitive_speech_account_sku
+
+  tags = local.required_tags
 }
 
 resource "azurerm_app_service_plan" "app_plan" {
-  name                = "${local.name_prefix}app_plan"
+  name                = "${local.name_prefix}plan"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "Linux"
@@ -161,6 +169,8 @@ resource "azurerm_app_service_plan" "app_plan" {
     tier = "Standard"
     size = "S2"
   }
+
+  tags = local.required_tags
 }
 
 resource "azurerm_app_service" "app_container" {
@@ -185,4 +195,6 @@ resource "azurerm_app_service" "app_container" {
   app_settings = {
     "AZURE_MONITOR_INSTRUMENTATION_KEY" = azurerm_application_insights.insights.instrumentation_key
   }
+
+  tags = local.required_tags
 }
