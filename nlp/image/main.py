@@ -16,7 +16,6 @@ if os.path.exists(localenv):
 
 client_id = os.environ.get("CLIENT_ID")
 
-
 # pre fill client id
 swagger_ui_init_oauth = {
     "usePkceWithAuthorizationCodeGrant": "true",

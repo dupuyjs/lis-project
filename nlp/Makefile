@@ -10,7 +10,7 @@ clean:
 	@rm -Rf src/aad.egg-info
 
 run-local:
-	@PYTHONPATH=./nlp uvicorn main:app --reload --port 9000
+	@PYTHONPATH=./image uvicorn main:app --reload --host localhost --port 9000
 
 install-deps:
 	pip install -r requirements.txt
