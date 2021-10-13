@@ -85,8 +85,6 @@ class AadAuthenticationClient:
 
         _ensure_options_property("client_id")
         _ensure_options_property("authority")
-        _ensure_options_property("vault_url")
-        _ensure_options_property("vault_certificate_name")
 
     async def build_msal_public_app(self, **kwargs) -> msal.PublicClientApplication:
         self._ensure_options()
