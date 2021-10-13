@@ -128,9 +128,9 @@ resource "azurerm_machine_learning_workspace" "workspace" {
   }
 }
 
-# Create an Azure ML Compute Cluster
+# Create an Azure ML Compute Instance
 resource "azurerm_machine_learning_compute_instance" "compute_instance" {
-  name                          = "${local.name_prefix}cc"
+  name                          = "${local.name_prefix}ci"
   location                      = azurerm_resource_group.rg.location
   virtual_machine_size          = var.ccluster_vm_size
   machine_learning_workspace_id = azurerm_machine_learning_workspace.workspace.id
