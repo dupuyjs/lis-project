@@ -124,12 +124,11 @@ resource "azurerm_machine_learning_workspace" "workspace" {
   application_insights_id = azurerm_application_insights.insights.id
   key_vault_id            = azurerm_key_vault.kv.id
   storage_account_id      = azurerm_storage_account.st.id
+  tags                    = local.required_tags
 
   identity {
     type = "SystemAssigned"
   }
-
-  tags = local.required_tags
 }
 
 # Create an Azure ML Compute Instance
@@ -138,12 +137,11 @@ resource "azurerm_machine_learning_compute_instance" "compute_instance" {
   location                      = azurerm_resource_group.rg.location
   virtual_machine_size          = var.ml_instance_vm_size
   machine_learning_workspace_id = azurerm_machine_learning_workspace.workspace.id
+  tags                          = local.required_tags
 
   identity {
     type = "SystemAssigned"
   }
-
-  tags = local.required_tags
 }
 
 # Create an Azure Cognitive Services Account (SpeechServices)
@@ -152,10 +150,8 @@ resource "azurerm_cognitive_account" "speech" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "SpeechServices"
-
-  sku_name = var.cognitive_speech_account_sku
-
-  tags = local.required_tags
+  sku_name            = var.cognitive_speech_account_sku
+  tags                = local.required_tags
 }
 
 resource "azurerm_app_service_plan" "app_plan" {
@@ -164,13 +160,12 @@ resource "azurerm_app_service_plan" "app_plan" {
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "Linux"
   reserved            = true
+  tags                = local.required_tags
 
   sku {
     tier = "Standard"
     size = "S2"
   }
-
-  tags = local.required_tags
 }
 
 resource "azurerm_app_service" "app_container" {
@@ -180,6 +175,7 @@ resource "azurerm_app_service" "app_container" {
   app_service_plan_id     = azurerm_app_service_plan.app_plan.id
   https_only              = true
   client_affinity_enabled = true
+  tags                    = local.required_tags
 
   site_config {
     always_on                            = true
@@ -195,6 +191,4 @@ resource "azurerm_app_service" "app_container" {
   app_settings = {
     "AZURE_MONITOR_INSTRUMENTATION_KEY" = azurerm_application_insights.insights.instrumentation_key
   }
-
-  tags = local.required_tags
 }
