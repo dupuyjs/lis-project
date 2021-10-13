@@ -47,7 +47,7 @@ resource "azurerm_container_registry" "acr" {
 resource "azurerm_role_assignment" "acr_pull_role" {
   scope                = azurerm_container_registry.acr.id
   role_definition_name = "acrpull"
-  principal_id         = azurerm_app_service.app_container.identity.principal_id
+  principal_id         = azurerm_app_service.app_container.identity[0].principal_id
 }
 
 # Create azure key vault
@@ -174,7 +174,6 @@ resource "azurerm_app_service" "app_container" {
   site_config {
     always_on                            = true
     acr_use_managed_identity_credentials = true
-    acr_user_managed_identity_client_id  = azurerm_role_assignment.acr_pull_role.id
 
     linux_fx_version = "DOCKER|registry.hub.docker.com/tutum/hello-world"
   }
