@@ -45,10 +45,6 @@ class AzureAdSettings(BaseSettings):
     def keys_url(self):
         return f"{self.authority}/discovery/v2.0/keys"
 
-    # @property
-    # def issuer(self):
-    #     return f"https://sts.windows.net/{self.tenant_id}/"
-
     def get_available_issuers(self):
         if self.aad_issuers_list is not None and len(self.aad_issuers_list) > 0:
             return self.aad_issuers_list
@@ -116,8 +112,6 @@ class AzureAdSettings(BaseSettings):
         if self.graph_scopes is not None:
             _graph_scopes = self.graph_scopes
 
-        # _graph_scopes.extend(_api_scopes)
-        # return _graph_scopes
         _api_scopes.extend(_graph_scopes)
         return _api_scopes
 
