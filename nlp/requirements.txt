@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+tensorflow==2.5.0
+transformers
+Authlib==0.15.4
+msal==1.12.0
+azure-identity==1.6.0
+aiohttp==3.7.4.post0
+python-dotenv==0.17.1
