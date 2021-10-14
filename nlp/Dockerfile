@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.4.1-cudnn8-runtime-ubuntu18.04
+FROM ubuntu:20.10
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8 
@@ -16,6 +16,7 @@ WORKDIR /app
 
 ADD requirements.txt /app
 ADD main.py /app
+ADD aad /app/aad
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
