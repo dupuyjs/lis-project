@@ -37,13 +37,14 @@ jobs:
         
     - name: Build and push the docker image to container registry
       run: |
-        docker build ./nlp/image -t ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
+        docker build ./nlp -t ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
         docker push ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
 
     - name: 'Deploy application container to the Azure Web App'
-      run: |
-        az webapp config container set --name ${{ steps.acrsecrets.outputs.APP-NAME }} --resource-group ${{ steps.acrsecrets.outputs.RG-NAME }} --docker-custom-image-name ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }} --docker-registry-server-url ${{ steps.acrsecrets.outputs.ACR-LOGIN }} --docker-registry-server-user ${{ steps.acrsecrets.outputs.ACR-USERNAME }} --docker-registry-server-password ${{ steps.acrsecrets.outputs.ACR-PASSWORD }}
-
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ steps.acrsecrets.outputs.APP-NAME }}
+        images: ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
         
         
     
