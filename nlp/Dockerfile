@@ -15,8 +15,8 @@ RUN mkdir /app
 WORKDIR /app
 
 ADD requirements.txt /app
-ADD main.py /app
-ADD aad /app/aad
+ADD /src/main.py /app
+ADD /src/aad /app/aad
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt

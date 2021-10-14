@@ -10,7 +10,7 @@ clean:
 	@rm -Rf src/aad.egg-info
 
 run-local:
-	@PYTHONPATH=./image uvicorn main:app --reload --host localhost --port 9000
+	@PYTHONPATH=./src uvicorn main:app --reload --host localhost --port 9000
 
 install-deps:
 	pip install -r requirements.txt
