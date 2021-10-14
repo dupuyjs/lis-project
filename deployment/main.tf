@@ -192,3 +192,9 @@ resource "azurerm_app_service" "app_container" {
     "AZURE_MONITOR_INSTRUMENTATION_KEY" = azurerm_application_insights.insights.instrumentation_key
   }
 }
+
+resource "azurerm_key_vault_secret" "secret_app_container_name" {
+  name         = "APP-NAME"
+  value        = azurerm_app_service.app_container.name
+  key_vault_id = azurerm_key_vault.kv.id
+}

@@ -25,7 +25,7 @@ jobs:
       uses: Azure/get-keyvault-secrets@v1
       with: 
         keyvault: ${{ secrets.KEYVAULT_NAME }}
-        secrets: 'ACR-LOGIN, ACR-USERNAME, ACR-PASSWORD, RG-NAME, AKS-NAME'
+        secrets: 'ACR-LOGIN, ACR-USERNAME, ACR-PASSWORD, RG-NAME, APP-NAME'
       id: acrsecrets
 
     - name: Login to the container registry
@@ -40,22 +40,9 @@ jobs:
         docker build ./nlp/image -t ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
         docker push ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
 
-    - name: Substitute image variable in nlp-deployment.yaml
-      uses: microsoft/variable-substitution@v1
-      with:
-        files: '${{github.workspace}}/nlp/nlp-deployment.yaml'
-      env:
-        spec.template.spec.containers.0.image: ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
-
-    - name: Display nlp-deployment.yaml content
+    - name: 'Deploy application container to the Azure Web App'
       run: |
-        cat ${{github.workspace}}/nlp/nlp-deployment.yaml
-
-    - name: 'Deploy application and service to kubernetes cluster'
-      run: |
-        az aks get-credentials --resource-group ${{ steps.acrsecrets.outputs.RG-NAME }} --name ${{ steps.acrsecrets.outputs.AKS-NAME }}
-        kubectl apply -f ./nlp/nlp-deployment.yaml
-        kubectl apply -f ./nlp/nlp-service.yaml
+        az webapp config container set --name ${{ steps.acrsecrets.outputs.APP-NAME }} --resource-group ${{ steps.acrsecrets.outputs.RG-NAME }} --docker-custom-image-name ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }} --docker-registry-server-url ${{ steps.acrsecrets.outputs.ACR-LOGIN }} --docker-registry-server-user ${{ steps.acrsecrets.outputs.ACR-USERNAME }} --docker-registry-server-password ${{ steps.acrsecrets.outputs.ACR-PASSWORD }}
 
         
         
