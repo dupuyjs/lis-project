@@ -1,0 +1,40 @@
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repo
+      uses: actions/checkout@v2
+      
+    - name: Login with azure credentials
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Get key vault secrets
+      uses: Azure/get-keyvault-secrets@v1
+      with: 
+        keyvault: ${{ secrets.KEYVAULT_NAME }}
+        secrets: 'ACR-LOGIN, ACR-USERNAME, ACR-PASSWORD, RG-NAME, APP-NAME'
+      id: acrsecrets
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init & Apply
+      working-directory: ./deployment
+      run: |
+        terraform init
+        terraform apply -auto-approve
+        terraform output -json | jq -cr 'to_entries[] | "\(.key)=\(.value.value)"' > tf-outputs.sh
+        source tf-outputs.sh
+
+    - name: Create Azure ML Pipeline
+      working-directory: ./azureml/AMLPipeline
+      run: |
+        python -m pip install --upgrade pip
+        pip install azureml-core azureml-pipeline-core azureml-pipeline-steps
+        subscription_id=$(az account show --query id -o tsv)
+        python ../scripts/create_pipeline.py $subscription_id $resource_group_name $ml_workspace_name $ml_compute_instance_name $storage_account_name
