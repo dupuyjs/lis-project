@@ -40,11 +40,14 @@ jobs:
         docker build ./nlp -t ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
         docker push ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
 
-    - name: 'Deploy application container to the Azure Web App'
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ steps.acrsecrets.outputs.APP-NAME }}
-        images: ${{ steps.acrsecrets.outputs.ACR-LOGIN }}/lis-nlp:${{ github.run_number }}
+    # cf. https://github.com/Azure/app-service-linux-docs/blob/master/HowTo/use_system-assigned_managed_identities.md
+    - name: 'Update web app image version'
+      run : |
+        config=$(az webapp show -g ${{ steps.acrsecrets.outputs.RG-NAME }} -n ${{ steps.acrsecrets.outputs.APP-NAME }} --query id --output tsv)"/config/web"
+        fxversion="Docker|"${{ steps.acrsecrets.outputs.ACR-LOGIN }}"/lis-nlp:"${{ github.run_number }}
+        az resource update --ids $config --set properties.acrUseManagedIdentityCreds=True -o none
+        az resource update --ids $config --set properties.linuxFxVersion=$fxversion -o none --force-string
+
         
         
     
