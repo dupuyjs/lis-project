@@ -70,6 +70,10 @@ resource "azurerm_key_vault" "kv" {
       "delete"
     ]
   }
+
+  lifecycle {
+    ignore_changes = [access_policy]
+  }
 }
 
 # Create secrets
@@ -94,6 +98,12 @@ resource "azurerm_key_vault_secret" "secret_acr_username" {
 resource "azurerm_key_vault_secret" "secret_acr_password" {
   name         = "ACR-PASSWORD"
   value        = azurerm_container_registry.acr.admin_password
+  key_vault_id = azurerm_key_vault.kv.id
+}
+
+resource "azurerm_key_vault_secret" "secret_app_container_name" {
+  name         = "APP-NAME"
+  value        = azurerm_app_service.app_container.name
   key_vault_id = azurerm_key_vault.kv.id
 }
 
@@ -154,6 +164,7 @@ resource "azurerm_cognitive_account" "speech" {
   tags                = local.required_tags
 }
 
+# Create a Web App for Containers
 resource "azurerm_app_service_plan" "app_plan" {
   name                = "${local.name_prefix}plan"
   location            = azurerm_resource_group.rg.location
@@ -191,10 +202,4 @@ resource "azurerm_app_service" "app_container" {
   app_settings = {
     "AZURE_MONITOR_INSTRUMENTATION_KEY" = azurerm_application_insights.insights.instrumentation_key
   }
-}
-
-resource "azurerm_key_vault_secret" "secret_app_container_name" {
-  name         = "APP-NAME"
-  value        = azurerm_app_service.app_container.name
-  key_vault_id = azurerm_key_vault.kv.id
 }
