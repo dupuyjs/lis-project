@@ -1,0 +1,13 @@
+# NOTE: Requires **VS2019 16.3** or later
+
+# New Rule Set
+# Description:  
+
+# Code files
+[*.{cs,vb}]
+
+
+dotnet_diagnostic.IDE0008.severity = none
+
+[*.cs]
+csharp_style_var_when_type_is_apparent=true:silent
