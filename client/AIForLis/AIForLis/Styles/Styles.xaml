@@ -1,0 +1,49 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- COLORS -->
+    <Color x:Key="ThemeGrayHigh1Color">#FF3F3F3F</Color>
+    <Color x:Key="ThemeGrayHigh2Color">#FF434343</Color>
+    <Color x:Key="ThemeGrayMediumColor">#FF797979</Color>
+    <Color x:Key="ThemeGrayLow1Color">#FFCCCCCC</Color>
+    <Color x:Key="ThemeGrayLow2Color">#FFDDDDDD</Color>
+    <Color x:Key="ThemeGrayLow3Color">#FFEEEEEE</Color>
+
+    <SolidColorBrush x:Key="ThemeGrayHigh1ColorBrush" Color="{ThemeResource ThemeGrayHigh1Color}"/>
+    <SolidColorBrush x:Key="ThemeGrayHigh2ColorBrush" Color="{ThemeResource ThemeGrayHigh2Color}"/>
+    <SolidColorBrush x:Key="ThemeGrayMediumColorBrush" Color="{ThemeResource ThemeGrayMediumColor}"/>
+    <SolidColorBrush x:Key="ThemeGrayLow1ColorBrush" Color="{ThemeResource ThemeGrayLow1Color}"/>
+    <SolidColorBrush x:Key="ThemeGrayLow2ColorBrush" Color="{ThemeResource ThemeGrayLow2Color}"/>
+    <SolidColorBrush x:Key="ThemeGrayLow3ColorBrush" Color="{ThemeResource ThemeGrayLow3Color}"/>
+
+    <Color x:Key="ThemeRedHigh1Color">#FFDF0044</Color>
+    <Color x:Key="ThemeRedHigh2Color">#FFFE0752</Color>
+
+    <SolidColorBrush x:Key="ThemeRedHigh1ColorBrush" Color="{ThemeResource ThemeRedHigh1Color}"/>
+    <SolidColorBrush x:Key="ThemeredHigh2ColorBrush" Color="{ThemeResource ThemeRedHigh2Color}"/>
+
+    <!-- STYLES -->
+    <Style TargetType="TextBlock" x:Key="ThemeUserWelcomeStyle">
+        <Setter Property="FontWeight" Value="SemiLight"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="TextAlignment" Value="Right"/>
+    </Style>
+
+    <Style TargetType="TextBlock" x:Key="ThemeUserNameStyle">
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="TextAlignment" Value="Right"/>
+    </Style>
+
+    <Style TargetType="TextBlock" x:Key="SpeechOutputStyle">
+        <Setter Property="FontWeight" Value="SemiLight"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="TextAlignment" Value="Left"/>
+        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+    </Style>
+
+</ResourceDictionary>
