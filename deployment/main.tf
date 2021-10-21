@@ -12,7 +12,7 @@ provider "azurerm" {
 }
 
 resource "random_string" "random" {
-  length  = 5
+  length  = 4
   special = false
   number  = true
   lower   = true
@@ -28,14 +28,14 @@ locals {
 
 # Create resource group
 resource "azurerm_resource_group" "rg" {
-  name     = "${local.name_prefix}-${var.environment}-rg"
+  name     = "rg-${local.name_prefix}-${var.environment}"
   location = var.location
   tags     = local.required_tags
 }
 
 # Create azure container registry
 resource "azurerm_container_registry" "acr" {
-  name                = "${local.name_prefix}acr"
+  name                = "cr${local.name_prefix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   sku                 = var.container_registry_sku
@@ -52,7 +52,7 @@ resource "azurerm_role_assignment" "acr_pull_role" {
 
 # Create azure key vault
 resource "azurerm_key_vault" "kv" {
-  name                = "${local.name_prefix}kv"
+  name                = "kv${local.name_prefix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
@@ -107,9 +107,22 @@ resource "azurerm_key_vault_secret" "secret_app_container_name" {
   key_vault_id = azurerm_key_vault.kv.id
 }
 
-# Create a Storage Account
-resource "azurerm_storage_account" "st" {
-  name                     = "${local.name_prefix}st"
+resource "azurerm_key_vault_secret" "secret_storage_data_name" {
+  name         = "STORAGE-DATA-NAME"
+  value        = azurerm_storage_account.data_storage.name
+  key_vault_id = azurerm_key_vault.kv.id
+}
+
+resource "azurerm_key_vault_secret" "secret_storage_data_key" {
+  name         = "STORAGE-DATA-KEY"
+  value        = azurerm_storage_account.data_storage.primary_access_key
+  key_vault_id = azurerm_key_vault.kv.id
+}
+
+# Create storage accounts
+resource "azurerm_storage_account" "ml_storage" {
+  count                    = var.deploy_data_science_tools ? 1 : 0
+  name                     = "st${local.name_prefix}ml"
   location                 = azurerm_resource_group.rg.location
   resource_group_name      = azurerm_resource_group.rg.name
   account_tier             = var.storage_account_tier
@@ -117,23 +130,33 @@ resource "azurerm_storage_account" "st" {
   tags                     = local.required_tags
 }
 
-# Create an Application Insights
+resource "azurerm_storage_account" "data_storage" {
+  name                     = "st${local.name_prefix}data"
+  location                 = azurerm_resource_group.rg.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  account_tier             = var.storage_account_tier
+  account_replication_type = var.storage_replication_type
+  tags                     = local.required_tags
+}
+
+# Create application insights
 resource "azurerm_application_insights" "insights" {
-  name                = "${local.name_prefix}ai"
+  name                = "insights${local.name_prefix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   application_type    = var.insights_app_type
   tags                = local.required_tags
 }
 
-# Create an Azure ML Workspace
+# Create azure ml workspace
 resource "azurerm_machine_learning_workspace" "workspace" {
-  name                    = "${local.name_prefix}mlw"
+  count                   = var.deploy_data_science_tools ? 1 : 0
+  name                    = "mlw${local.name_prefix}"
   location                = azurerm_resource_group.rg.location
   resource_group_name     = azurerm_resource_group.rg.name
   application_insights_id = azurerm_application_insights.insights.id
   key_vault_id            = azurerm_key_vault.kv.id
-  storage_account_id      = azurerm_storage_account.st.id
+  storage_account_id      = azurerm_storage_account.ml_storage[0].id
   tags                    = local.required_tags
 
   identity {
@@ -141,12 +164,13 @@ resource "azurerm_machine_learning_workspace" "workspace" {
   }
 }
 
-# Create an Azure ML Compute Instance
+# Create azure ml compute instance
 resource "azurerm_machine_learning_compute_instance" "compute_instance" {
-  name                          = "${local.name_prefix}ci"
+  count                         = var.deploy_data_science_tools ? 1 : 0
+  name                          = "compute${local.name_prefix}"
   location                      = azurerm_resource_group.rg.location
   virtual_machine_size          = var.ml_instance_vm_size
-  machine_learning_workspace_id = azurerm_machine_learning_workspace.workspace.id
+  machine_learning_workspace_id = azurerm_machine_learning_workspace.workspace[0].id
   tags                          = local.required_tags
 
   identity {
@@ -154,9 +178,9 @@ resource "azurerm_machine_learning_compute_instance" "compute_instance" {
   }
 }
 
-# Create an Azure Cognitive Services Account (SpeechServices)
+# Create speech services account
 resource "azurerm_cognitive_account" "speech" {
-  name                = "${local.name_prefix}speech"
+  name                = "speech${local.name_prefix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "SpeechServices"
@@ -164,9 +188,9 @@ resource "azurerm_cognitive_account" "speech" {
   tags                = local.required_tags
 }
 
-# Create a Web App for Containers
+# Create web app for containers
 resource "azurerm_app_service_plan" "app_plan" {
-  name                = "${local.name_prefix}plan"
+  name                = "plan${local.name_prefix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "Linux"
@@ -180,7 +204,7 @@ resource "azurerm_app_service_plan" "app_plan" {
 }
 
 resource "azurerm_app_service" "app_container" {
-  name                    = "${local.name_prefix}app"
+  name                    = "webapp${local.name_prefix}"
   location                = azurerm_resource_group.rg.location
   resource_group_name     = azurerm_resource_group.rg.name
   app_service_plan_id     = azurerm_app_service_plan.app_plan.id
@@ -202,4 +226,12 @@ resource "azurerm_app_service" "app_container" {
   app_settings = {
     "AZURE_MONITOR_INSTRUMENTATION_KEY" = azurerm_application_insights.insights.instrumentation_key
   }
+}
+
+# Create azure cognitive search
+resource "azurerm_search_service" "search" {
+  name                = "search${local.name_prefix}"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "basic"
 }

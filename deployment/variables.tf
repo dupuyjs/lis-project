@@ -57,3 +57,9 @@ variable "cognitive_speech_account_sku" {
   type        = string
   default     = "S0"
 }
+
+variable "deploy_data_science_tools" {
+  description = "Defines if azure machine learning is installed."
+  type        = bool
+  default     = "false"
+}
