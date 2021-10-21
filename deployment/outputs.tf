@@ -4,7 +4,7 @@ output "resource_group_name" {
 }
 
 output "acr_login_server" {
-  description = "The URL that can be used to log into the container registry."
+  description = "The url that can be used to log into the container registry."
   value       = azurerm_container_registry.acr.login_server
 }
 
@@ -24,33 +24,38 @@ output "key_vault_name" {
   value       = azurerm_key_vault.kv.name
 }
 
-output "storage_account_name" {
-  description = "The Storage Account name."
-  value       = azurerm_storage_account.st.name
+output "ml_storage_account_name" {
+  description = "The ml storage account name."
+  value       = var.deploy_data_science_tools ? azurerm_storage_account.ml_storage[0].name : ""
+}
+
+output "data_storage_account_name" {
+  description = "The data storage account name."
+  value       = azurerm_storage_account.data_storage.name
 }
 
 output "ml_workspace_name" {
-  description = "The ML Workspace name."
-  value       = azurerm_machine_learning_workspace.workspace.name
+  description = "The ml workspace name."
+  value       = var.deploy_data_science_tools ? azurerm_machine_learning_workspace.workspace[0].name : ""
 }
 
 output "ml_compute_instance_name" {
-  description = "The ML Compute Cluster name."
-  value       = azurerm_machine_learning_compute_instance.compute_instance.name
+  description = "The ml compute instance name."
+  value       = var.deploy_data_science_tools ? azurerm_machine_learning_compute_instance.compute_instance[0].name : ""
 }
 
-output "speechservices_cognitiveaccount_name" {
-  description = "The Cognitive Service Account name."
+output "speechservice_cognitive_name" {
+  description = "The speech service name."
   value       = azurerm_cognitive_account.speech.name
 }
 
-output "speechservices_cognitiveaccount_key" {
-  description = "The Cognitive Service Account Key."
+output "speechservice_cognitive_key" {
+  description = "The speech service subscription key."
   value       = azurerm_cognitive_account.speech.primary_access_key
   sensitive   = true
 }
 
 output "app_service_webapp_hostname" {
-  description = "The URL of the App Service Webapp"
+  description = "The url of the app service webapp."
   value       = azurerm_app_service.app_container.default_site_hostname
 }
