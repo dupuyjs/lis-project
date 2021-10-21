@@ -30,16 +30,16 @@ app = FastAPI(
 # Add the bearer middleware
 app.add_middleware(AuthenticationMiddleware, backend=AadBearerMiddleware())
 
-classifier = pipeline("sentiment-analysis")
+fill_mask = pipeline("fill-mask", model="camembert-base", tokenizer="camembert-base")
 
 @app.get('/api/healthcheck', status_code=200, tags=["api"])
 async def healthcheck():
     return 'Ready'
 
-@app.get('/api/sentiment', tags=["api"]) 
-async def predict(sentence: str, request: Request, token=Depends(oauth2_scheme())):
-    result = classifier(sentence)
-    return result[0]
+@app.get('/api/autosuggest', tags=["api"]) 
+async def autosuggest(sentence: str, request: Request, token=Depends(oauth2_scheme())):
+    results = fill_mask(sentence)
+    return results
 
 @app.get('/request/me', tags=["request"]) 
 async def request_user_me(request: Request, token=Depends(oauth2_scheme())):
@@ -68,7 +68,6 @@ async def graph_me(request: Request, token=Depends(oauth2_scheme())):
         )
 
         jsonvalue = response.json()
-
 
         return jsonvalue
 
