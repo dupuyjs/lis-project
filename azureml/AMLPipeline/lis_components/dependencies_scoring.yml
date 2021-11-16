@@ -1,0 +1,13 @@
+
+name: lis_env_scoring
+    
+dependencies:
+  # The python interpreter version.
+  # Currently Azure ML Workbench only supports 3.5.2 and later.
+  - python=3.6.9
+  - pip
+
+  - pip:
+      - transformers == 3.5.1
+      - tensorflow == 2.5.0
+      - azureml-defaults==1.30.0
